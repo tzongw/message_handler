@@ -1,7 +1,7 @@
 import logging
 import traceback
 from baseclient import BaseClient, handler
-from ping_pb2 import Ping
+from ping_pb2 import Ping, Pong
 
 class Client(BaseClient):
     _SOCKET_TIMEOUT = 10 * 60
@@ -13,9 +13,13 @@ class Client(BaseClient):
     @handler(Ping)
     def onPing(self, req):
         logging.info('onPing: %s', req)
-        self.writeMessage(req)
-        self.close()
+        res = Pong()
+        self.writeMessage(res)
 
+    @handler(Pong)
+    def onPong(self, req):
+        logging.info('onPong: %s', req)
+        self.close()
 
 def handle(socket, address):
     try:

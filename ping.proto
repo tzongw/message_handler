@@ -1,7 +1,12 @@
-enum URI{
+enum URI {
     PING = 0x10000;
+    PONG = 0x10001;
 }
 
 message Ping {
     optional URI uri = 1 [default=PING];
+}
+
+message Pong {
+    optional URI uri = 1 [default=PONG];
 }

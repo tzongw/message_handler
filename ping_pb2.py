@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\nping.proto\"\x1f\n\x04Ping\x12\x17\n\x03uri\x18\x01 \x01(\x0e\x32\x04.URI:\x04PING*\x11\n\x03URI\x12\n\n\x04PING\x10\x80\x80\x04')
+  serialized_pb=_b('\n\nping.proto\"\x1f\n\x04Ping\x12\x17\n\x03uri\x18\x01 \x01(\x0e\x32\x04.URI:\x04PING\"\x1f\n\x04Pong\x12\x17\n\x03uri\x18\x01 \x01(\x0e\x32\x04.URI:\x04PONG*\x1d\n\x03URI\x12\n\n\x04PING\x10\x80\x80\x04\x12\n\n\x04PONG\x10\x81\x80\x04')
 )
 
 _URI = _descriptor.EnumDescriptor(
@@ -33,16 +33,21 @@ _URI = _descriptor.EnumDescriptor(
       name='PING', index=0, number=65536,
       serialized_options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='PONG', index=1, number=65537,
+      serialized_options=None,
+      type=None),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=47,
-  serialized_end=64,
+  serialized_start=80,
+  serialized_end=109,
 )
 _sym_db.RegisterEnumDescriptor(_URI)
 
 URI = enum_type_wrapper.EnumTypeWrapper(_URI)
 PING = 65536
+PONG = 65537
 
 
 
@@ -76,8 +81,41 @@ _PING = _descriptor.Descriptor(
   serialized_end=45,
 )
 
+
+_PONG = _descriptor.Descriptor(
+  name='Pong',
+  full_name='Pong',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='uri', full_name='Pong.uri', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=True, default_value=65537,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=47,
+  serialized_end=78,
+)
+
 _PING.fields_by_name['uri'].enum_type = _URI
+_PONG.fields_by_name['uri'].enum_type = _URI
 DESCRIPTOR.message_types_by_name['Ping'] = _PING
+DESCRIPTOR.message_types_by_name['Pong'] = _PONG
 DESCRIPTOR.enum_types_by_name['URI'] = _URI
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -87,6 +125,13 @@ Ping = _reflection.GeneratedProtocolMessageType('Ping', (_message.Message,), dic
   # @@protoc_insertion_point(class_scope:Ping)
   ))
 _sym_db.RegisterMessage(Ping)
+
+Pong = _reflection.GeneratedProtocolMessageType('Pong', (_message.Message,), dict(
+  DESCRIPTOR = _PONG,
+  __module__ = 'ping_pb2'
+  # @@protoc_insertion_point(class_scope:Pong)
+  ))
+_sym_db.RegisterMessage(Pong)
 
 
 # @@protoc_insertion_point(module_scope)
