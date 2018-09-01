@@ -1,0 +1,7 @@
+enum URI{
+    PING = 0x10000;
+}
+
+message Ping {
+    optional URI uri = 1 [default=PING];
+}
