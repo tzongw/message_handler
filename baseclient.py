@@ -2,6 +2,7 @@ from thrift.transport import TSocket, TTransport
 from thrift.protocol import TBinaryProtocol
 from google.protobuf import message
 
+
 class BaseClient(object):
     _messageHandlers = {}
     _LENGTH_LIMIT = 10 * 1024 * 1024

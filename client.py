@@ -1,7 +1,7 @@
 import logging
-import traceback
-from baseclient import BaseClient, handler
+from baseclient import BaseClient
 from ping_handlers import PingHandles
+
 
 class Client(PingHandles, BaseClient):
     _SOCKET_TIMEOUT = 10 * 60
@@ -17,7 +17,7 @@ def handle(socket, address):
         client = Client(socket)
         client.serve()
     except Exception as e:
-        logging.warn('exception %s, %s', e, traceback.format_exc())
+        logging.warn('exception %s', e, exc_info=True)
     finally:
         logging.info('<<< addr: %s', address)
 
