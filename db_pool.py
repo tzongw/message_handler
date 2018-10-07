@@ -1,13 +1,17 @@
 import contextlib
 from gevent.queue import Queue
+from weakref import WeakKeyDictionary
+from time import time
 
 
 class AbstractDatabaseConnectionPool(object):
-    def __init__(self, maxsize=32, timeout=5):
+    def __init__(self, maxsize=32, timeout=5, check_time=3600):
         self.maxsize = maxsize
         self.timeout = timeout
         self.pool = Queue()
         self.size = 0
+        self.check_time = check_time
+        self.check_dict = WeakKeyDictionary()
 
     def create_connection(self):
         raise NotImplementedError()
@@ -40,6 +44,10 @@ class AbstractDatabaseConnectionPool(object):
     def connection(self):
         conn = self.get()
         try:
+            current = time()
+            last_check = self.check_dict.get(conn, current)
+            if current - last_check > self.check_time:
+                conn.ping()
             yield conn
         except:
             conn.close()
@@ -47,6 +55,7 @@ class AbstractDatabaseConnectionPool(object):
             raise
         else:
             self.put(conn)
+            self.check_dict[conn] = current
 
     @contextlib.contextmanager
     def cursor(self, transaction=False):
