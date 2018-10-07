@@ -1,19 +1,11 @@
-import sys
 import contextlib
 from gevent.queue import Queue
 
-if sys.version_info[0] >= 3:
-    integer_types = (int,)
-else:
-    import __builtin__
-    integer_types = (int, __builtin__.long)
-
 
 class AbstractDatabaseConnectionPool(object):
-    def __init__(self, maxsize=32):
-        if not isinstance(maxsize, integer_types):
-            raise TypeError('Expected integer, got %r' % (maxsize, ))
+    def __init__(self, maxsize=32, timeout=5):
         self.maxsize = maxsize
+        self.timeout = timeout
         self.pool = Queue()
         self.size = 0
 
@@ -23,7 +15,7 @@ class AbstractDatabaseConnectionPool(object):
     def get(self):
         pool = self.pool
         if self.size >= self.maxsize or pool.qsize():
-            return pool.get()
+            return pool.get(self.timeout)
 
         self.size += 1
         try:
@@ -52,7 +44,6 @@ class AbstractDatabaseConnectionPool(object):
         except:
             conn.close()
             self.size -= 1
-            self.create_connection()
             raise
         else:
             self.put(conn)
