@@ -5,13 +5,16 @@ from time import time
 
 
 class AbstractDatabaseConnectionPool(object):
-    def __init__(self, maxsize=32, timeout=5, check_time=3600):
+    def __init__(self, maxsize=32, timeout=5, check_time=3600, idle=None):
         self.maxsize = maxsize
         self.timeout = timeout
         self.pool = Queue()
         self.size = 0
         self.check_time = check_time
         self.check_dict = WeakKeyDictionary()
+        if idle is None:
+            idle = max(maxsize//10, 1)
+        self.idle = idle
 
     def create_connection(self):
         raise NotImplementedError()
@@ -43,6 +46,10 @@ class AbstractDatabaseConnectionPool(object):
     @contextlib.contextmanager
     def connection(self):
         conn = self.get()
+
+        def close_conn():
+            conn.close()
+            self.size -= 1
         try:
             current = time()
             last_check = self.check_dict.get(conn, current)
@@ -50,12 +57,14 @@ class AbstractDatabaseConnectionPool(object):
                 conn.ping()
             yield conn
         except:
-            conn.close()
-            self.size -= 1
+            close_conn()
             raise
         else:
-            self.put(conn)
-            self.check_dict[conn] = current
+            if self.pool.qsize() < self.idle:
+                self.put(conn)
+                self.check_dict[conn] = current
+            else:
+                close_conn()
 
     @contextlib.contextmanager
     def cursor(self, transaction=False):
