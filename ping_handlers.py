@@ -1,15 +1,16 @@
 import logging
-from baseclient import handler
+from baseclient import message_handler
 from ping_pb2 import Ping, Pong
 
-class PingHandles(object):
-    @handler(Ping)
-    def onPing(self, req):
-        logging.info('onPing: %s', req)
-        res = Pong()
-        self.writeMessage(res)
 
-    @handler(Pong)
-    def onPong(self, req):
-        logging.info('onPong: %s', req)
+class PingHandlers(object):
+    @message_handler(Ping)
+    def on_ping(self, req):
+        logging.info('on ping: %s', req)
+        res = Pong()
+        self.write_message(res)
+
+    @message_handler(Pong)
+    def on_pong(self, req):
+        logging.info('on pong: %s', req)
         self.close()

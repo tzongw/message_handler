@@ -1,9 +1,9 @@
 import logging
 from baseclient import BaseClient
-from ping_handlers import PingHandles
+from ping_handlers import PingHandlers
 
 
-class Client(PingHandles, BaseClient):
+class Client(PingHandlers, BaseClient):
     _SOCKET_TIMEOUT = 10 * 60
 
     def __init__(self, socket):

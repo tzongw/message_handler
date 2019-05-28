@@ -9,7 +9,8 @@ def main():
     s.connect(('localhost', 8888))
     c = Client(s)
     req = Ping()
-    c.writeMessage(req)
+    c.write_message(req)
+    c.flush()
     c.serve()
 
 if __name__ ==  '__main__':

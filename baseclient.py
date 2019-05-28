@@ -1,10 +1,10 @@
 from thrift.transport import TSocket, TTransport
 from thrift.protocol import TBinaryProtocol
-from google.protobuf import message
+from google.protobuf.message import Message
 
 
 class BaseClient(object):
-    _messageHandlers = {}
+    _message_handlers = {}
     _LENGTH_LIMIT = 10 * 1024 * 1024
 
     def __init__(self, socket):
@@ -18,32 +18,35 @@ class BaseClient(object):
             self.proto.trans.close()
             self.proto = None
 
-    def writeMessage(self, message, flush=True):
+    def write_message(self, message):
         self.proto.writeI32(message.uri)
         buf = message.SerializeToString()
         self.proto.writeBinary(buf)
-        if flush:
+
+    def flush(self):
+        if self.proto:
             self.proto.trans.flush()
 
     def serve(self):
         while self.proto:
             uri = self.proto.readI32()
             buf = self.proto.readBinary()
-            handler = self._messageHandlers.get(uri)
+            handler = self._message_handlers.get(uri)
             if handler:
-                Message, func = handler
-                message = Message()
+                message_cls, func = handler
+                message = message_cls()
                 message.ParseFromString(buf)
                 func(self, message)
+                self.flush()
 
 
-def handler(Message):
+def message_handler(message_cls):
     def wrapper(f):
-        assert issubclass(Message, message.Message), 'Message type'
-        uri = Message().uri
-        handles = BaseClient._messageHandlers
-        assert uri not in handles, 'Duplicate uri'
-        handles[uri] = (Message, f)
+        assert issubclass(message_cls, Message), 'message type wrong'
+        uri = message_cls().uri
+        handles = BaseClient._message_handlers
+        assert uri not in handles, 'duplicate uri'
+        handles[uri] = (message_cls, f)
         return f
     return wrapper
 
