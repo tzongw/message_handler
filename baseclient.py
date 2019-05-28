@@ -39,16 +39,19 @@ class BaseClient(object):
                 func(self, message)
                 self.flush()
 
+    @classmethod
+    def message_handler(cls, message_cls):
+        def wrapper(f):
+            assert issubclass(message_cls, Message), 'message type wrong'
+            uri = message_cls().uri
+            handlers = cls._message_handlers
+            assert uri not in handlers, 'duplicate uri'
+            handlers[uri] = (message_cls, f)
+            return f
+        return wrapper
+
 
 def message_handler(message_cls):
-    def wrapper(f):
-        assert issubclass(message_cls, Message), 'message type wrong'
-        uri = message_cls().uri
-        handles = BaseClient._message_handlers
-        assert uri not in handles, 'duplicate uri'
-        handles[uri] = (message_cls, f)
-        return f
-    return wrapper
-
+    return BaseClient.message_handler(message_cls)
 
 
