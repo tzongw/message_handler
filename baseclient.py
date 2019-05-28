@@ -13,6 +13,9 @@ class BaseClient(object):
         trans = TTransport.TBufferedTransport(tsocket)
         self.proto = TBinaryProtocol.TBinaryProtocol(trans, string_length_limit=self._LENGTH_LIMIT)
 
+    def __del__(self):
+        self.close()
+
     def close(self):
         if self.proto:
             self.proto.trans.close()
