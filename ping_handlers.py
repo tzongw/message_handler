@@ -1,9 +1,9 @@
 import logging
-from baseclient import message_handler
+from baseclient import message_handler, BaseClient
 from ping_pb2 import Ping, Pong
 
 
-class PingHandlers(object):
+class PingHandlers(BaseClient):
     @message_handler(Ping)
     def on_ping(self, req):
         logging.info('on ping: %s', req)
