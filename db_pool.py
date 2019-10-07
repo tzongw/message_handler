@@ -5,7 +5,7 @@ from time import time
 
 
 class AbstractDatabaseConnectionPool(object):
-    def __init__(self, maxsize=32, timeout=5, check_time=3600, idle=None):
+    def __init__(self, maxsize=64, timeout=5, check_time=3600, idle=None):
         self.maxsize = maxsize
         self.timeout = timeout
         self.pool = Queue()
@@ -13,7 +13,7 @@ class AbstractDatabaseConnectionPool(object):
         self.check_time = check_time
         self.check_dict = WeakKeyDictionary()
         if idle is None:
-            idle = max(maxsize//10, 1)
+            idle = maxsize
         self.idle = idle
 
     def create_connection(self):
@@ -27,7 +27,7 @@ class AbstractDatabaseConnectionPool(object):
         self.size += 1
         try:
             new_item = self.create_connection()
-        except:
+        except Exception:
             self.size -= 1
             raise
         return new_item
@@ -35,12 +35,12 @@ class AbstractDatabaseConnectionPool(object):
     def put(self, item):
         self.pool.put(item)
 
-    def closeall(self):
+    def close_all(self):
         while not self.pool.empty():
             conn = self.pool.get_nowait()
             try:
                 conn.close()
-            except:
+            except Exception:
                 pass
 
     @contextlib.contextmanager
@@ -56,7 +56,7 @@ class AbstractDatabaseConnectionPool(object):
             if current - last_check > self.check_time:
                 conn.ping()
             yield conn
-        except:
+        except Exception:
             close_conn()
             raise
         else:
