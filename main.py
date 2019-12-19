@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+from gevent import monkey
+
+monkey.patch_all()
 import logging
-
 from gevent.server import StreamServer
-
 from client import handle
 
 
