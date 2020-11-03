@@ -44,14 +44,14 @@ class BaseClient(object):
 
     @classmethod
     def message_handler(cls, message_cls):
-        def wrapper(f):
+        def decorator(f):
             assert issubclass(message_cls, Message), 'message type wrong'
             uri = message_cls().uri
             handlers = cls._message_handlers
             assert uri not in handlers, 'duplicate uri'
             handlers[uri] = (message_cls, f)
             return f
-        return wrapper
+        return decorator
 
 
 def message_handler(message_cls):
